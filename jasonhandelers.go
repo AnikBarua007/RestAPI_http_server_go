@@ -1,0 +1,50 @@
+package main
+
+import (
+	"encoding/json"
+	"net/http"
+)
+
+func handlerValidate(w http.ResponseWriter, r *http.Request) {
+	type perameters struct {
+		Body string `json:"body"`
+	}
+	type response struct {
+		valid bool `json:"valid"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := perameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, 400, "Something went wrong")
+		return
+	}
+	const maxLength = 140
+	if len(params.Body) > 140 {
+		respondWithError(w, 400, "Chirp is too long")
+		return
+	}
+	respondWithJSON(w, 200, response{
+		valid: true})
+
+}
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	type returnvals struct {
+		error string `json: error`
+	}
+	respBody := returnvals{error: msg}
+	dat, _ := json.Marshal(respBody)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(dat)
+}
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	//type response struct {
+	//	valid bool `json:"valid"`
+	//}
+	//respBody := response{valid: true}
+	dat, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(dat)
+}
