@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"slices"
+	"strings"
 )
 
 func handlerValidate(w http.ResponseWriter, r *http.Request) {
@@ -10,7 +12,7 @@ func handlerValidate(w http.ResponseWriter, r *http.Request) {
 		Body string `json:"body"`
 	}
 	type response struct {
-		valid bool `json:"valid"`
+		Cleaned_body string `json:"cleaned_body"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := perameters{}
@@ -24,15 +26,26 @@ func handlerValidate(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 400, "Chirp is too long")
 		return
 	}
-	respondWithJSON(w, 200, response{
-		valid: true})
+	mesage := strings.ToLower(params.Body)
+	words := strings.Split(mesage, " ")
+	badwords := []string{"kerfuffle", "sharbert", "fornax"}
+	for i, word := range words {
+		if slices.Contains(badwords, word) {
+			words[i] = "****"
+		}
+	}
+	message := strings.Join(words, " ")
 
+	respondWithJSON(w, 200, response{
+		Cleaned_body: message,
+	})
+	return
 }
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	type returnvals struct {
-		error string `json: error`
+		Error string `json: error`
 	}
-	respBody := returnvals{error: msg}
+	respBody := returnvals{Error: msg}
 	dat, _ := json.Marshal(respBody)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
