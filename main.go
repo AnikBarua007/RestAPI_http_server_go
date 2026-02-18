@@ -45,12 +45,18 @@ func main() {
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 	mux.HandleFunc("GET /admin/metrics", apicfg.handlermatrics)
 	mux.HandleFunc("POST /admin/reset", apicfg.handlerReset)
-	mux.HandleFunc("POST /api/validate_chirp", handlerValidate)
+	//mux.HandleFunc("POST /api/validate_chirp", handlerValidate)
 	mux.HandleFunc("POST /api/users", apicfg.handleruser)
+	mux.HandleFunc("POST /api/chirps", apicfg.handlerChirp)
+
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,
 	}
 	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("MISS: method=%s path=%s", r.Method, r.URL.Path)
+		http.NotFound(w, r)
+	})
 	log.Fatal(server.ListenAndServe())
 }
