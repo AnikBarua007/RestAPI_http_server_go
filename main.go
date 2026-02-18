@@ -20,29 +20,24 @@ type apiConfig struct {
 func main() {
 	const filepathRoot = "."
 	const port = "8080"
-
 	if err := godotenv.Load(); err != nil {
 		log.Printf("warning: could not load .env file: %v", err)
 	}
-
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
 		log.Fatal("DB_URL must be set")
 	}
-
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("error opening database connection: %v", err)
 	}
 	defer db.Close()
-
 	dbQueries := database.New(db)
 
 	apicfg := apiConfig{
 		fileserverHits: atomic.Int32{},
 		dbQueries:      dbQueries,
 	}
-
 	mux := http.NewServeMux()
 	//mux.Handle("/assets/", http.FileServer(http.Dir(".")))
 	fshandler := apicfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
@@ -51,7 +46,7 @@ func main() {
 	mux.HandleFunc("GET /admin/metrics", apicfg.handlermatrics)
 	mux.HandleFunc("POST /admin/reset", apicfg.handlerReset)
 	mux.HandleFunc("POST /api/validate_chirp", handlerValidate)
-
+	mux.HandleFunc("POST /api/users", apicfg.handleruser)
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,

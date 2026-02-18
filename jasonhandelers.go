@@ -2,11 +2,40 @@ package main
 
 import (
 	"encoding/json"
+
 	"net/http"
+
 	"slices"
 	"strings"
+
+	"time"
 )
 
+func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
+	type params struct {
+		Email string `json:"email"`
+	}
+	type response struct {
+		ID         string    `json:"id"`
+		Created_At time.Time `json:"created_at"`
+		Updated_At time.Time `json:"updated_at"`
+		Email      string    `json:"email"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	parameters := params{}
+	decoder.Decode(&parameters)
+	user, _ := cfg.dbQueries.CreateUser(r.Context(), parameters.Email)
+	res := response{
+		ID:         user.ID.String(),
+		Created_At: user.CreatedAt,
+		Updated_At: user.UpdatedAt,
+		Email:      user.Email,
+	}
+	dat, _ := json.Marshal(res)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	w.Write(dat)
+}
 func handlerValidate(w http.ResponseWriter, r *http.Request) {
 	type perameters struct {
 		Body string `json:"body"`
