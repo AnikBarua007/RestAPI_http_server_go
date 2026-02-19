@@ -12,6 +12,31 @@ import (
 	"github.com/google/uuid"
 )
 
+func (cfg *apiConfig) handlerGetIDchirps(w http.ResponseWriter, r *http.Request) {
+	chirpstr := r.PathValue("chirpID")
+	chirpID, err := uuid.Parse(chirpstr)
+	chirp, _ := cfg.dbQueries.GetOneChirp(r.Context(), chirpID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	type response struct {
+		ID         string    `json:"id"`
+		Created_At time.Time `json:"created_at"`
+		Updated_At time.Time `json:"updated_at"`
+		Body       string    `json:"body"`
+		UserID     string    `json:"user_id"`
+	}
+	res := response{
+		ID:         chirp.UserID.String(),
+		Created_At: chirp.CreatedAt,
+		Updated_At: chirp.UpdatedAt,
+		Body:       chirp.Body,
+		UserID:     chirp.ID.String(),
+	}
+	dat, _ := json.Marshal(res)
+	w.Write(dat)
+	w.WriteHeader(http.StatusOK)
+}
 func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 	type params struct {
 		Email string `json:"email"`
