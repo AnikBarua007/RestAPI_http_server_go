@@ -8,6 +8,7 @@ import (
 
 	"time"
 
+	"github.com/AnikBarua007/http_server_go/internal/auth"
 	"github.com/AnikBarua007/http_server_go/internal/database"
 	"github.com/google/uuid"
 )
@@ -39,7 +40,8 @@ func (cfg *apiConfig) handlerGetIDchirps(w http.ResponseWriter, r *http.Request)
 }
 func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 	type params struct {
-		Email string `json:"email"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 	type response struct {
 		ID         string    `json:"id"`
@@ -57,8 +59,12 @@ func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 400, "email is required")
 		return
 	}
+	hashed_password, err := auth.HashPassword(parameters.Password)
 
-	user, err := cfg.dbQueries.CreateUser(r.Context(), parameters.Email)
+	user, err := cfg.dbQueries.CreateUser(r.Context(), database.CreateUserParams{
+		Email:          parameters.Email,
+		HashedPassword: hashed_password,
+	})
 	if err != nil {
 		respondWithError(w, 500, err.Error()) // temporary for debugging
 		return
