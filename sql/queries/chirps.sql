@@ -15,3 +15,8 @@ WHERE id = $1;
 -- name: DeleteChirp :exec
 DELETE FROM chirps
 WHERE id = $1;
+--name: Upgrade_chirpy :exec
+UPDATE users
+SET is_chirpy_red = TRUE,
+    updated_at=NOW()
+where id=$1;
