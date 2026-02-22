@@ -35,8 +35,9 @@ func (cfg *apiConfig) handlerGetIDchirps(w http.ResponseWriter, r *http.Request)
 		UserID:     chirp.ID.String(),
 	}
 	dat, _ := json.Marshal(res)
-	w.Write(dat)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(dat)
 }
 func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 	type params struct {
