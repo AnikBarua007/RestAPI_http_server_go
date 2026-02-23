@@ -98,3 +98,15 @@ func (q *Queries) GetOneChirp(ctx context.Context, id uuid.UUID) (Chirp, error) 
 	)
 	return i, err
 }
+
+const upgrade_chirpy = `-- name: Upgrade_chirpy :exec
+UPDATE users
+SET is_chirpy_red = TRUE,
+    updated_at=NOW()
+where id=$1
+`
+
+func (q *Queries) Upgrade_chirpy(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, upgrade_chirpy, id)
+	return err
+}

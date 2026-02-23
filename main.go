@@ -16,6 +16,7 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	dbQueries      *database.Queries
 	jwtSecret      string
+	polkaapi       string
 }
 
 func main() {
@@ -38,10 +39,12 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET must be set")
 	}
+	polkaapi := os.Getenv("POLKA_KEY")
 	apicfg := apiConfig{
 		fileserverHits: atomic.Int32{},
 		dbQueries:      dbQueries,
 		jwtSecret:      jwtSecret,
+		polkaapi:       polkaapi,
 	}
 	mux := http.NewServeMux()
 	//mux.Handle("/assets/", http.FileServer(http.Dir(".")))
@@ -60,6 +63,7 @@ func main() {
 	mux.HandleFunc("POST /api/revoke", apicfg.handlerRevoke)
 	mux.HandleFunc("PUT /api/users", apicfg.handlerUserPut)
 	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apicfg.handlerDeleteChirps)
+	mux.HandleFunc("POST /api/polka/webhooks", apicfg.handlerUserUpgrade)
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,

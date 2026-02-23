@@ -45,10 +45,11 @@ func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 	}
 	type response struct {
-		ID         string    `json:"id"`
-		Created_At time.Time `json:"created_at"`
-		Updated_At time.Time `json:"updated_at"`
-		Email      string    `json:"email"`
+		ID           string    `json:"id"`
+		Created_At   time.Time `json:"created_at"`
+		Updated_At   time.Time `json:"updated_at"`
+		Email        string    `json:"email"`
+		Is_Chirp_RED bool      `json:"is_chirp_red_red"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	parameters := params{}
@@ -71,10 +72,11 @@ func (cfg *apiConfig) handleruser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := response{
-		ID:         user.ID.String(),
-		Created_At: user.CreatedAt,
-		Updated_At: user.UpdatedAt,
-		Email:      user.Email,
+		ID:           user.ID.String(),
+		Created_At:   user.CreatedAt,
+		Updated_At:   user.UpdatedAt,
+		Email:        user.Email,
+		Is_Chirp_RED: user.IsChirpyRed,
 	}
 	dat, _ := json.Marshal(res)
 	w.Header().Set("Content-Type", "application/json")

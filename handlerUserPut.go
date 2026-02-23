@@ -15,10 +15,11 @@ func (cfg *apiConfig) handlerUserPut(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 	}
 	type response struct {
-		ID        string    `json:"id"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-		Email     string    `json:"email"`
+		ID           string    `json:"id"`
+		CreatedAt    time.Time `json:"created_at"`
+		UpdatedAt    time.Time `json:"updated_at"`
+		Email        string    `json:"email"`
+		Is_Chirp_Red bool      `json:"is_chirp_red"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -58,9 +59,10 @@ func (cfg *apiConfig) handlerUserPut(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusUnauthorized, response{
-		ID:        updatedUser.ID.String(),
-		CreatedAt: updatedUser.CreatedAt,
-		UpdatedAt: updatedUser.UpdatedAt,
-		Email:     updatedUser.Email,
+		ID:           updatedUser.ID.String(),
+		CreatedAt:    updatedUser.CreatedAt,
+		UpdatedAt:    updatedUser.UpdatedAt,
+		Email:        updatedUser.Email,
+		Is_Chirp_Red: updatedUser.IsChirpyRed,
 	})
 }

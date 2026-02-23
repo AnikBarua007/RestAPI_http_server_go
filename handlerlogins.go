@@ -15,12 +15,13 @@ func (cfg *apiConfig) handlerlogins(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 	}
 	type response struct {
-		ID        string    `json:"id"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-		Email     string    `json:"email"`
-		Token     string    `json:"token"`
-		Refresh   string    `json:"refresh_token"`
+		ID            string    `json:"id"`
+		CreatedAt     time.Time `json:"created_at"`
+		UpdatedAt     time.Time `json:"updated_at"`
+		Email         string    `json:"email"`
+		Token         string    `json:"token"`
+		Refresh       string    `json:"refresh_token"`
+		IS_CHIRPY_RED bool      `json:"is_chirpy_red"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -63,12 +64,13 @@ func (cfg *apiConfig) handlerlogins(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := response{
-		ID:        user.ID.String(),
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Email:     user.Email,
-		Token:     token,
-		Refresh:   refreshToken,
+		ID:            user.ID.String(),
+		CreatedAt:     user.CreatedAt,
+		UpdatedAt:     user.UpdatedAt,
+		Email:         user.Email,
+		Token:         token,
+		Refresh:       refreshToken,
+		IS_CHIRPY_RED: user.IsChirpyRed,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	dat, _ := json.Marshal(res)
